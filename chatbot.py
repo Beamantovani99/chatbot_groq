@@ -15,7 +15,6 @@ st.set_page_config(
 # --- CUSTOM STYLE (rosa/viola) ---
 st.markdown("""
     <style>
-        /* Sfondo generale */
         body {
             background-color: #ffe6f2;
         }
@@ -23,13 +22,11 @@ st.markdown("""
             background: linear-gradient(135deg, #ffd6f5, #f3c4ff, #e5b3ff);
         }
 
-        /* Titolo */
         h1 {
             color: #b30086 !important;
             text-shadow: 1px 1px 2px #ffb3e6;
         }
 
-        /* Chat bubbles */
         .stChatMessage {
             border-radius: 12px !important;
             padding: 12px !important;
@@ -47,6 +44,11 @@ st.markdown("""
             border: 1px solid #d699ff !important;
         }
 
+        /* Testo dei messaggi (nero per leggibilità) */
+        .stChatMessage p, .stChatMessage span, .stChatMessage div {
+            color: #000000 !important;
+        }
+
         /* Input box */
         .stChatInputContainer {
             background-color: #ffe6ff !important;
@@ -60,6 +62,7 @@ st.markdown("""
         }
     </style>
 """, unsafe_allow_html=True)
+
 
 # Titolo
 st.title("💬 Chatbot di IA Generativa")
