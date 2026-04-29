@@ -8,81 +8,61 @@ load_dotenv()
 # streamlit page setup
 st.set_page_config(
     page_title="Bea's chatbot",
-    page_icon="🍄",
+    page_icon="🤖",
     layout="wide",
 )
 
-# ===== PIXEL FONT + MARIO STYLE =====
+# --- CUSTOM STYLE (rosa/viola) ---
 st.markdown("""
-<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+        /* Sfondo generale */
+        body {
+            background-color: #ffe6f2;
+        }
+        .stApp {
+            background: linear-gradient(135deg, #ffd6f5, #f3c4ff, #e5b3ff);
+        }
 
-<style>
+        /* Titolo */
+        h1 {
+            color: #b30086 !important;
+            text-shadow: 1px 1px 2px #ffb3e6;
+        }
 
-/* ===== FONT PIXEL ===== */
-html, body, [class*="css"]  {
-    font-family: 'Press Start 2P', monospace;
-}
+        /* Chat bubbles */
+        .stChatMessage {
+            border-radius: 12px !important;
+            padding: 12px !important;
+        }
 
-/* ===== SFONDO MARIO PULITO ===== */
-.stApp {
-    background: linear-gradient(#5c94fc 70%, #c2f0ff 100%);
-}
+        /* Messaggi utente */
+        .stChatMessage[data-testid="chat-message-user"] {
+            background-color: #ffccf2 !important;
+            border: 1px solid #ff99e6 !important;
+        }
 
-/* ===== TITOLO ===== */
-h1 {
-    color: #e52521;
-    text-align: center;
-    font-size: 18px;
-    text-shadow: 2px 2px #000;
-}
+        /* Messaggi assistente */
+        .stChatMessage[data-testid="chat-message-assistant"] {
+            background-color: #f2ccff !important;
+            border: 1px solid #d699ff !important;
+        }
 
-/* ===== CHAT BOX ===== */
-[data-testid="stChatMessage"] {
-    border: 3px solid black;
-    border-radius: 4px;
-    padding: 12px;
-    margin-bottom: 12px;
-    font-size: 10px;
-    line-height: 1.6;
-}
+        /* Input box */
+        .stChatInputContainer {
+            background-color: #ffe6ff !important;
+            border-radius: 10px !important;
+            border: 2px solid #ffb3ff !important;
+        }
 
-/* USER = coin */
-[data-testid="stChatMessage"][aria-label="user"] {
-    background-color: #ffd84d;
-}
-
-/* BOT = pipe */
-[data-testid="stChatMessage"][aria-label="assistant"] {
-    background-color: #5fd35f;
-}
-
-/* ===== INPUT ===== */
-textarea {
-    font-family: 'Press Start 2P', monospace !important;
-    font-size: 10px !important;
-    border: 3px solid black !important;
-    border-radius: 4px !important;
-    background-color: #fff !important;
-}
-
-/* ===== INPUT CONTAINER ===== */
-[data-testid="stChatInput"] {
-    background-color: #ffffff;
-    border-top: 4px solid black;
-}
-
-/* ===== SCROLLBAR RETRO ===== */
-::-webkit-scrollbar {
-    width: 8px;
-}
-::-webkit-scrollbar-thumb {
-    background: black;
-}
-
-</style>
+        input[type="text"] {
+            background-color: #fff0ff !important;
+            color: #66004d !important;
+        }
+    </style>
 """, unsafe_allow_html=True)
 
-st.title("🍄 SUPER MARIO CHATBOT")
+# Titolo
+st.title("💬 Chatbot di IA Generativa")
 
 # initiate chat history
 if "chat_history" not in st.session_state:
@@ -90,8 +70,7 @@ if "chat_history" not in st.session_state:
 
 # show chat history
 for message in st.session_state.chat_history:
-    avatar = "🧑" if message["role"] == "user" else "🍄"
-    with st.chat_message(message["role"], avatar=avatar):
+    with st.chat_message(message["role"]):
         st.markdown(message["content"])
 
 # llm initiate
@@ -101,18 +80,17 @@ llm = ChatGroq(
 )
 
 # input box
-user_prompt = st.chat_input("Scrivi...")
+user_prompt = st.chat_input("Chiedi al Chatbot...")
 
 if user_prompt:
-    st.chat_message("user", avatar="🧑").markdown(user_prompt)
+    st.chat_message("user").markdown(user_prompt)
     st.session_state.chat_history.append({"role": "user", "content": user_prompt})
 
     response = llm.invoke(
         input=[{"role": "system", "content": "Sei un assistente utile"}, *st.session_state.chat_history]
     )
-
     assistant_response = response.content
     st.session_state.chat_history.append({"role": "assistant", "content": assistant_response})
 
-    with st.chat_message("assistant", avatar="🍄"):
+    with st.chat_message("assistant"):
         st.markdown(assistant_response)
