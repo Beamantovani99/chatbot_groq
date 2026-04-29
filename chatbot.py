@@ -2,93 +2,113 @@ from dotenv import load_dotenv
 import streamlit as st
 from langchain_groq import ChatGroq
 
+# load the env variables
 load_dotenv()
 
-# ------------------ PAGE CONFIG ------------------
+# streamlit page setup
 st.set_page_config(
-    page_title="Bea's Mario Chatbot",
+    page_title="Bea's chatbot",
     page_icon="🍄",
     layout="wide",
 )
 
-# ------------------ CUSTOM CSS ------------------
+# ===== PIXEL FONT + MARIO STYLE =====
 st.markdown("""
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+
 <style>
 
-/* Sfondo cielo Mario */
+/* ===== FONT PIXEL ===== */
+html, body, [class*="css"]  {
+    font-family: 'Press Start 2P', monospace;
+}
+
+/* ===== SFONDO MARIO PULITO ===== */
 .stApp {
-    background-image: url("https://i.imgur.com/8QfQKQp.png");
-    background-size: cover;
+    background: linear-gradient(#5c94fc 70%, #c2f0ff 100%);
 }
 
-/* Titolo stile pixel */
+/* ===== TITOLO ===== */
 h1 {
-    color: #ff0000;
-    text-shadow: 3px 3px 0px #000;
-    font-family: monospace;
+    color: #e52521;
+    text-align: center;
+    font-size: 18px;
+    text-shadow: 2px 2px #000;
 }
 
-/* Chat bubble utente */
-[data-testid="stChatMessage"][data-testid*="user"] {
-    background-color: #ffcc00;
-    border: 3px solid #000;
-    border-radius: 10px;
+/* ===== CHAT BOX ===== */
+[data-testid="stChatMessage"] {
+    border: 3px solid black;
+    border-radius: 4px;
+    padding: 12px;
+    margin-bottom: 12px;
+    font-size: 10px;
+    line-height: 1.6;
 }
 
-/* Chat bubble bot */
-[data-testid="stChatMessage"][data-testid*="assistant"] {
-    background-color: #00cc66;
-    border: 3px solid #000;
-    border-radius: 10px;
+/* USER = coin */
+[data-testid="stChatMessage"][aria-label="user"] {
+    background-color: #ffd84d;
 }
 
-/* Input box */
+/* BOT = pipe */
+[data-testid="stChatMessage"][aria-label="assistant"] {
+    background-color: #5fd35f;
+}
+
+/* ===== INPUT ===== */
 textarea {
-    border: 3px solid #000 !important;
-    background-color: #fff8dc !important;
+    font-family: 'Press Start 2P', monospace !important;
+    font-size: 10px !important;
+    border: 3px solid black !important;
+    border-radius: 4px !important;
+    background-color: #fff !important;
 }
 
-/* Bottone stile blocco Mario */
-button {
-    background-color: #ff0000 !important;
-    color: white !important;
-    border: 3px solid black !important;
-    font-weight: bold;
+/* ===== INPUT CONTAINER ===== */
+[data-testid="stChatInput"] {
+    background-color: #ffffff;
+    border-top: 4px solid black;
+}
+
+/* ===== SCROLLBAR RETRO ===== */
+::-webkit-scrollbar {
+    width: 8px;
+}
+::-webkit-scrollbar-thumb {
+    background: black;
 }
 
 </style>
 """, unsafe_allow_html=True)
 
-# ------------------ TITLE ------------------
-st.title("🍄 Super Mario Chatbot")
+st.title("🍄 SUPER MARIO CHATBOT")
 
-# ------------------ CHAT HISTORY ------------------
+# initiate chat history
 if "chat_history" not in st.session_state:
     st.session_state.chat_history = []
 
+# show chat history
 for message in st.session_state.chat_history:
-    avatar = "🍄" if message["role"] == "assistant" else "🧑"
+    avatar = "🧑" if message["role"] == "user" else "🍄"
     with st.chat_message(message["role"], avatar=avatar):
         st.markdown(message["content"])
 
-# ------------------ MODEL ------------------
+# llm initiate
 llm = ChatGroq(
     model="llama-3.1-8b-instant",
     temperature=0.0,
 )
 
-# ------------------ INPUT ------------------
-user_prompt = st.chat_input("💬 Scrivi qui...")
+# input box
+user_prompt = st.chat_input("Scrivi...")
 
 if user_prompt:
     st.chat_message("user", avatar="🧑").markdown(user_prompt)
     st.session_state.chat_history.append({"role": "user", "content": user_prompt})
 
     response = llm.invoke(
-        input=[
-            {"role": "system", "content": "Sei un assistente utile in stile Super Mario"},
-            *st.session_state.chat_history
-        ]
+        input=[{"role": "system", "content": "Sei un assistente utile"}, *st.session_state.chat_history]
     )
 
     assistant_response = response.content
